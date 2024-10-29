@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include "api_client.h"
 #include "order_manager.h"
-
 void DisplayMenu() {
     std::cout << "Order Execution and Management System\n";
     std::cout << "1. Place Order\n";
@@ -13,7 +12,6 @@ void DisplayMenu() {
     std::cout << "0. Exit\n";
     std::cout << "Select an option: ";
 }
-
 int main() {
     const char* client_id = std::getenv("DERIBIT_CLIENT_ID");
     const char* client_secret = std::getenv("DERIBIT_CLIENT_SECRET");
@@ -26,6 +24,7 @@ int main() {
     OrderManager order_manager(api_client);
     
     int choice;
+
     while (true) {
         DisplayMenu();
         std::cin >> choice;
@@ -42,13 +41,22 @@ int main() {
                 std::string instrument;
                 double price;
                 double amount;
+                std::string order_type;
                 std::cout << "Enter instrument (e.g., ETH-PERPETUAL): ";
                 std::cin >> instrument;
                 std::cout << "Enter amount: ";
                 std::cin >> amount;
                 std::cout << "Enter price: ";
                 std::cin >> price;
-                order_manager.PlaceOrder(instrument, amount, price, OrderType::Buy);
+                std::cout<<"Enter the type of order (ie; Buy/Sell) : ";
+                std::cin>>order_type;
+                if(order_type=="Buy"){
+                    order_manager.PlaceOrder(instrument, amount, price, OrderType::Buy);
+                }
+                else{
+                    order_manager.PlaceOrder(instrument, amount, price, OrderType::Sell);
+                }
+                
                 break;
             }
             case 2: {

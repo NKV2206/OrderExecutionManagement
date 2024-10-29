@@ -51,6 +51,10 @@ std::string ApiClient::MakeRequest(const std::string& endpoint, const nlohmann::
     }
     return response;
 }
+/**
+ * @brief Initializes the API CLIENT and sets the access token required for future requests
+ * @return void
+ */
 
 void ApiClient::InitializeClient(){
     std::string endpoint="/public/auth?client_id=" + client_id_ + "&client_secret=" + client_secret_ + "&grant_type=client_credentials";

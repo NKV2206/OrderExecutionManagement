@@ -4,17 +4,21 @@
 #include "order_manager.h"
 
 int main() {
-    const char* api_key = std::getenv("DERIBIT_API_KEY");
-    const char* api_secret = std::getenv("DERIBIT_API_SECRET");
+    const char* client_id = std::getenv("DERIBIT_CLIENT_ID");
+    const char* client_secret = std::getenv("DERIBIT_CLIENT_SECRET");
 
-    if (!api_key || !api_secret) {
+    if (!client_id || !client_secret) {
         std::cerr << "Error: API key or secret not set in environment variables." << std::endl;
         return 1;
-
-    ApiClient api_client(api_key, api_secret);
+    }
+    ApiClient api_client(client_id, client_secret);
     OrderManager order_manager(api_client);
 
-    order_manager.PlaceOrder("BTC-PERPETUAL", 1, 30000, "limit");
+    //order_manager.PlaceOrder("ETH-PERPETUAL", 5000000, 160,OrderType::Buy);
+    //order_manager.CancelOrder("ETH-14417143873");
+    //order_manager.ModifyOrder("ETH-14417143873",4000,23000);
+    //order_manager.GetOrderBook("BTC-PERPETUAL",10);
+    //order_manager.ViewCurrentPositions();
 
     return 0;
 }

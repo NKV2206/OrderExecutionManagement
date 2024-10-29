@@ -1,3 +1,0 @@
-/home/nanda/Programming/order_execution_system/build/CMakeFiles/OrderExecutionSystem.dir
-/home/nanda/Programming/order_execution_system/build/CMakeFiles/edit_cache.dir
-/home/nanda/Programming/order_execution_system/build/CMakeFiles/rebuild_cache.dir

@@ -39,12 +39,6 @@ and then run the executable from the build directory using the command
 ```
     $ ./OrderExecutionSystem
 ```
-## Examples
-
-    ```md
-    ![alt text](assets/images/screenshot.png)
-    ```
-
 ## Features
 
 Features That could be implemented

@@ -62,28 +62,43 @@ void Logger::LogCancel(const std::string& jsonResponse){
     } 
 }
 void Logger::LogCurrentPositions(const std::string& jsonResponse){
-    auto jsonData = nlohmann::json::parse(jsonResponse);
-    if (jsonData.is_array() && !jsonData.empty()) {
-        std::cout << "Current Positions:\n";
-        for (const auto& position : jsonData) {
-            std::cout << "  Instrument Name: " << position["instrument_name"] << "\n";
-            std::cout << "  Size: " << position["size"] << "\n";
-            std::cout << "  Average Price: " << position["average_price"] << "\n";
-            std::cout << "  Mark Price: " << position["mark_price"] << "\n";
-            std::cout << "  Index Price: " << position["index_price"] << "\n";
-            std::cout << "  Estimated Liquidation Price: " << position["estimated_liquidation_price"] << "\n";
-            std::cout << "  Floating Profit/Loss: " << position["floating_profit_loss"] << "\n";
-            std::cout << "  Realized Profit/Loss: " << position["realized_profit_loss"] << "\n";
-            std::cout << "  Total Profit/Loss: " << position["total_profit_loss"] << "\n";
-            std::cout << "  Direction: " << position["direction"] << "\n";
-            std::cout << "  Leverage: " << position["leverage"] << "\n";
-            std::cout << "  Initial Margin: " << position["initial_margin"] << "\n";
-            std::cout << "  Maintenance Margin: " << position["maintenance_margin"] << "\n";
-            std::cout<<"\n";
-        }
-    } else {
-        std::cout << "No listings to show positions for.\n";
-        std::cout<<"\n";
+    nlohmann::json jsonData;
+
+    try {
+        jsonData = nlohmann::json::parse(jsonResponse);
+    } catch (const nlohmann::json::exception& e) {
+        std::cerr << "Failed to parse JSON: " << e.what() << std::endl;
+        return;
+    }
+    if (!jsonData.contains("result")) {
+        std::cerr << "Error: 'result' key not found in JSON." << std::endl;
+        return;
+    }
+
+    const auto& positions = jsonData["result"];
+
+    for (const auto& position : positions) {
+        std::cout << "Position Details:\n";
+        std::cout << "  Instrument Name: " << position.value("instrument_name", "Unknown") << "\n";
+        std::cout << "  Direction: " << position.value("direction", "Unknown") << "\n";
+        std::cout << "  Size: " << position.value("size", 0.0) << "\n";
+        std::cout << "  Average Price: " << position.value("average_price", 0.0) << "\n";
+        std::cout << "  Index Price: " << position.value("index_price", 0.0) << "\n";
+        std::cout << "  Mark Price: " << position.value("mark_price", 0.0) << "\n";
+        std::cout << "  Settlement Price: " << position.value("settlement_price", 0.0) << "\n";
+        std::cout << "  Maintenance Margin: " << position.value("maintenance_margin", 0.0) << "\n";
+        std::cout << "  Initial Margin: " << position.value("initial_margin", 0.0) << "\n";
+        std::cout << "  Floating Profit/Loss: " << position.value("floating_profit_loss", 0.0) << "\n";
+        std::cout << "  Realized Profit/Loss: " << position.value("realized_profit_loss", 0.0) << "\n";
+        std::cout << "  Total Profit/Loss: " << position.value("total_profit_loss", 0.0) << "\n";
+        std::cout << "  Estimated Liquidation Price: " << position.value("estimated_liquidation_price", 0.0) << "\n";
+        std::cout << "  Leverage: " << position.value("leverage", 1.0) << "\n";
+        std::cout << "  Size Currency: " << position.value("size_currency", 0.0) << "\n";
+        std::cout << "  Interest Value: " << position.value("interest_value", 0.0) << "\n";
+        std::cout << "  Delta: " << position.value("delta", 0.0) << "\n";
+        std::cout << "  Realized Funding: " << position.value("realized_funding", 0.0) << "\n";
+        std::cout << "  Open Orders Margin: " << position.value("open_orders_margin", 0.0) << "\n";
+        std::cout << "\n"; 
     }
 }
 
@@ -120,42 +135,62 @@ void Logger::LogEdit(const std::string& jsonResponse){
 }
 
 void Logger::LogOrderbook(const std::string& jsonResponse){
-    auto jsonData = nlohmann::json::parse(jsonResponse);
+    nlohmann::json jsonData;
 
-    std::cout << "Instrument Name: " << jsonData["instrument_name"] << "\n";
-    std::cout << "Current State: " << jsonData["state"] << "\n";
-    std::cout << "Timestamp: " << jsonData["timestamp"] << "\n";
-    std::cout << "Last Price: " << jsonData["last_price"] << "\n";
-    std::cout << "Best Bid Price: " << jsonData["best_bid_price"] << " (Amount: " 
-              << jsonData["best_bid_amount"] << ")\n";
-    std::cout << "Best Ask Price: " << jsonData["best_ask_price"] << " (Amount: " 
-              << jsonData["best_ask_amount"] << ")\n";
-    std::cout << "Index Price: " << jsonData["index_price"] << "\n";
-    std::cout << "Estimated Delivery Price: " << jsonData["estimated_delivery_price"] << "\n";
-    std::cout << "Open Interest: " << jsonData["open_interest"] << "\n";
-    std::cout << "Funding (8h): " << jsonData["funding_8h"] << "\n";
-    std::cout << "Change ID: " << jsonData["change_id"] << "\n";
+    try {
+        jsonData = nlohmann::json::parse(jsonResponse);
+    } catch (const nlohmann::json::exception& e) {
+        std::cerr << "Failed to parse JSON: " << e.what() << std::endl;
+        return;
+    }
+
+    if (!jsonData.contains("result")) {
+        std::cerr << "Error: 'result' key not found in JSON." << std::endl;
+        return;
+    }
+
+    const auto& result = jsonData["result"];
+
+    std::cout << "Instrument Name: " << result.value("instrument_name", "Unknown") << "\n";
+    std::cout << "Current State: " << result.value("state", "Unknown") << "\n";
+    std::cout << "Timestamp: " << result.value("timestamp", 0) << "\n";
+    std::cout << "Last Price: " << result.value("last_price", 0.0) << "\n";
+    std::cout << "Best Bid Price: " << result.value("best_bid_price", 0.0) << " (Amount: " 
+              << result.value("best_bid_amount", 0.0) << ")\n";
+    std::cout << "Best Ask Price: " << result.value("best_ask_price", 0.0) << " (Amount: " 
+              << result.value("best_ask_amount", 0.0) << ")\n";
+    std::cout << "Index Price: " << result.value("index_price", 0.0) << "\n";
+    std::cout << "Settlement Price: " << result.value("settlement_price", 0.0) << "\n";
+    std::cout << "Open Interest: " << result.value("open_interest", 0.0) << "\n";
+    std::cout << "Funding (8h): " << result.value("funding_8h", 0.0) << "\n";
+    std::cout << "Change ID: " << result.value("change_id", 0) << "\n";
     
-    
-    // Display stats
-    const auto& stats = jsonData["stats"];
+
+    const auto& stats = result.value("stats", nlohmann::json::object());
     std::cout << "Stats:\n";
-    std::cout << "  High: " << stats["high"] << "\n";
-    std::cout << "  Low: " << stats["low"] << "\n";
-    std::cout << "  Price Change: " << stats["price_change"] << "\n";
-    std::cout << "  Volume: " << stats["volume"] << "\n";
-    std::cout << "  Volume Notional: " << stats["volume_notional"] << "\n";
-    std::cout << "  Volume USD: " << stats["volume_usd"] << "\n";
+    std::cout << "  High: " << stats.value("high", 0.0) << "\n";
+    std::cout << "  Low: " << stats.value("low", 0.0) << "\n";
+    std::cout << "  Price Change: " << stats.value("price_change", 0.0) << "\n";
+    std::cout << "  Volume: " << stats.value("volume", 0.0) << "\n";
+    std::cout << "  Volume USD: " << stats.value("volume_usd", 0.0) << "\n";
+    std::cout << "  Volume Notional: " << stats.value("volume_notional", 0.0) << "\n";
+
 
     std::cout << "Bids:\n";
-    std::cout<<"\n";
-    for (const auto& bid : jsonData["bids"]) {
-        std::cout << "  Price: " << bid[0] << ", Amount: " << bid[1] << "\n";
-        std::cout<<"\n";
+    if (result.contains("bids")) {
+        for (const auto& bid : result["bids"]) {
+            std::cout << "  Price: " << bid.at(0).get<double>() << ", Amount: " << bid.at(1).get<double>() << "\n";
+        }
+    } else {
+        std::cout << "  No bids available.\n";
     }
+
     std::cout << "Asks:\n";
-    for (const auto& ask : jsonData["asks"]) {
-        std::cout << "  Price: " << ask[0] << ", Amount: " << ask[1] << "\n";
-        std::cout<<"\n";
+    if (result.contains("asks")) {
+        for (const auto& ask : result["asks"]) {
+            std::cout << "  Price: " << ask.at(0).get<double>() << ", Amount: " << ask.at(1).get<double>() << "\n";
+        }
+    } else {
+        std::cout << "  No asks available.\n";
     }
 }

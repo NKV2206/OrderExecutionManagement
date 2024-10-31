@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories(include)
 
-add_executable(OrderExecutionSystem src/main.cpp src/api_client.cpp src/order_manager.cpp)
+add_executable(OrderExecutionSystem src/main.cpp src/api_client.cpp src/order_manager.cpp src/logger.cpp)
 find_package(CURL REQUIRED)
 target_link_libraries(OrderExecutionSystem CURL::libcurl)

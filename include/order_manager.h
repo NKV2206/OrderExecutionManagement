@@ -4,7 +4,7 @@
 #include <string>
 #include "api_client.h"
 #include "nlohmann/json.hpp"
-
+#include "logger.h"
 enum class OrderType {
     Buy,
     Sell
@@ -22,6 +22,7 @@ class OrderManager {
 
  private:
     ApiClient& api_client_;
+    Logger logger;
 };
 
 #endif  // ORDER_EXECUTION_SYSTEM_ORDER_MANAGER_H_

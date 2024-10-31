@@ -1,6 +1,6 @@
 #include "order_manager.h"
 #include <iostream>
-
+#include "logger.h"
 OrderManager::OrderManager(ApiClient& api_client) : api_client_(api_client) {}
 /**
  * @brief Makes a request to the Deribit API to Place Buy/Sell Orders
@@ -10,9 +10,12 @@ OrderManager::OrderManager(ApiClient& api_client) : api_client_(api_client) {}
  * @param order_type Type of the Order ie; Buy/Sell
  * @return Logs the result of the attempt to place an order
  */
+
+
 void OrderManager::PlaceOrder(const std::string& instrument_name, double amount, double price,OrderType order_type) {
     std::string endpoint;
-    if(order_type==OrderType::Buy){
+    if(order_type==OrderType::Buy)
+    {
         endpoint="/private/buy";
     }
     else{
@@ -26,7 +29,7 @@ void OrderManager::PlaceOrder(const std::string& instrument_name, double amount,
     endpoint=endpoint + "?amount=" + std::to_string(amount)+"&instrument_name="+ instrument_name+"&price="+std::to_string(price)+"&label=market0000234&type=market";
 
     std::string result = api_client_.MakeRequest(endpoint, order_data);
-    std::cout << "Order Response: " << result << std::endl;  //For Debugging
+    logger.LogOrder(result);
 }
 
 /**
@@ -48,7 +51,7 @@ bool OrderManager::CancelOrder(const std::string& order_id){
     for (auto& [key, value] : jsonData.items()) {
         dataMap[key] = value.dump();
     }
-    std::cout << "Order Response: " << result << std::endl;  //For Debugging
+    logger.LogCancel(result);
     if(!dataMap["result"].empty()) return true;
     return false;
 }
@@ -74,14 +77,9 @@ bool OrderManager::ModifyOrder(const std::string& order_id,double new_price,doub
     for (auto& [key, value] : jsonData.items()) {
         dataMap[key] = value.dump();
     }
-
-    std::cout<<"Modify Response : "<<result<<std::endl;  // For Debugging
+    logger.LogEdit(result);
 
     if(dataMap.find("result")==dataMap.end()) return false;
-    nlohmann::json order=nlohmann::json::parse(dataMap["result"]);
-    for (auto& [key, value] : order.items()) {
-        dataMap[key] = value.dump();
-    }
     if(!dataMap["order"].empty()) return true;
     return false;
 }
@@ -100,14 +98,7 @@ void OrderManager::GetOrderBook(const std::string& instrument_name,int depth){
     };
     endpoint=endpoint+"?depth="+std::to_string(depth)+"&instrument_name="+instrument_name;
     std::string result = api_client_.MakeRequest(endpoint, book_data);
-    nlohmann::json jsonData=nlohmann::json::parse(result);
-    std::map<std::string, std::string> dataMap;
-    for (auto& [key, value] : jsonData.items()) {
-        dataMap[key] = value.dump();
-    }
-    // std::cout<<result<<std::endl;    
-   
-    if(dataMap.find("result")!=dataMap.end()) std::cout<<dataMap["result"]<<std::endl;
+    logger.LogOrderbook(result);
     return;
 }
 /**
@@ -122,11 +113,6 @@ void OrderManager::ViewCurrentPositions(){
         {"method", endpoint},
     };
     std::string result = api_client_.MakeRequest(endpoint, positions_data);
-    nlohmann::json jsonData=nlohmann::json::parse(result);
-    std::map<std::string, std::string> dataMap;
-    for (auto& [key, value] : jsonData.items()) {
-        dataMap[key] = value.dump();
-    }
-    std::cout<<dataMap["result"]<<std::endl;
+    logger.LogCurrentPositions(result);
     return;
 }
